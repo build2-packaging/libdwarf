@@ -1,16 +1,13 @@
 : 1
 name: dwarfdump
-version: 0.1.0-a.0.z
+version: 2.3.1-a.0.z
 language: c
 project: libdwarf
-summary: dwarfdump C executable
-license: other: proprietary ; Not free/open source.
+summary: Command-line utility for inspecting DWARF debugging information
+license: GPL-2.0-only ; GNU General Public License v2.0 only.
 description-file: README
-package-description-file: PACKAGE-README.md
-changes-file: NEWS
-url: https://example.org/upstream
-email: upstream@example.org
+url: https://github.com/davea42/libdwarf-code
 package-url: https://github.com/build2-packaging/libdwarf
-package-email: packaging@build2.org ; Mailing list.
 depends: * build2 >= 0.18.0
 depends: * bpkg >= 0.18.0
+depends: libdwarf == $
