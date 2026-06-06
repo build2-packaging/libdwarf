@@ -1,3 +1,55 @@
-import libs = libdwarf%lib{dwarf}
+import libs = libdwarf%lib{dwarf_private}
 
-exe{driver}: {h c}{**} $libs testscript{**}
+# Directory symlinks in this directory:
+#
+# src -> ../../../upstream/src   (upstream source tree; mirrors the
+#                                 hierarchy tests expect for data files)
+
+# One executable per upstream self-contained test (has its own main()).
+# Excluded: test_extra_flag_strings (requires libdwarfp, not packaged),
+#           test_macrocheck / test_regex (no main, #include .c directly),
+#           testobjLE32PE / testuriLE64ELfsource (Windows fixture / no main).
+#           Also exclude the dwarfdump specific tests (require dd internal hdrs)
+for t: c{test_*}
+  ./: exe{test-$name($t)}: $t $libs testscript
+
+# Tests requiring extra compilation units from the libdwarf private sources.
+#
+exe{test-test_dwarf_leb}:     src/lib/libdwarf/c{dwarf_leb}
+exe{test-test_dwarf_tied}:    src/lib/libdwarf/c{dwarf_tied dwarf_tsearchhash}
+exe{test-test_dwarfstring}:   src/lib/libdwarf/c{dwarf_string}
+exe{test-test_errmsglist}:    src/lib/libdwarf/c{dwarf_safe_strcpy}
+exe{test-test_getname}:       src/lib/libdwarf/c{dwarf_names}
+exe{test-test_ignoresec}:     src/lib/libdwarf/c{dwarf_secname_ck}
+exe{test-test_linkedtopath}:  src/lib/libdwarf/c{dwarf_safe_strcpy dwarf_string dwarf_debuglink}
+exe{test-test_safe_strcpy}:   src/lib/libdwarf/c{dwarf_safe_strcpy}
+exe{test-test_setupsections}: src/lib/libdwarf/c{dwarf_setup_sections}
+
+# dwarf_setup_sections.c: #ifndef TESTING guards a call to
+# dwarf_set_load_preference() that requires a full Dwarf_Debug context.
+# dd_esb.c:      #ifdef TESTING sets INITIAL_ALLOC=1 to stress buffer growth.
+#
+src/lib/libdwarf/obj{dwarf_setup_sections}:   c.poptions += -DTESTING
+# src/bin/dwarfdump/obj{dd_esb dd_sanitized}:   c.poptions += -DTESTING
+
+# Tests that locate data files relative to the upstream source tree root.
+# test_errmsglist: opens src/lib/libdwarf/libdwarf.h and dwarf_errmsg_list.h.
+# test_lname:      opens src/lib/libdwarf/dwarf.h and dwarf_lname_version.c.
+#
+# Passing $src_base as DWTOPSRCDIR (-f) makes the 'src/' symlink satisfy the
+# path.
+#
+exe{test-test_errmsglist}: src/lib/libdwarf/h{libdwarf dwarf_errmsg_list}: \
+                           include = adhoc
+exe{test-test_lname}: src/lib/libdwarf/h{dwarf} \
+                      src/lib/libdwarf/c{dwarf_lname_version}: \
+                      include = adhoc
+
+exe{test-test_errmsglist test-test_lname}:
+{
+  test.arguments = "-f" $src_base
+}
+
+# Build options.
+#
+c.poptions =+ -DLIBDWARF_STATIC

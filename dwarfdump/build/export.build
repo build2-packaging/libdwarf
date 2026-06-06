@@ -1,0 +1,6 @@
+$out_root/
+{
+  include dwarfdump/
+}
+
+export $out_root/dwarfdump/$import.target

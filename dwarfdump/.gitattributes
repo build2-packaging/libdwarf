@@ -1,0 +1,4 @@
+build/autoconf/checks symlink=dir
+
+tests/basics/src            symlink=dir
+tests/basics/upstream-tests symlink=dir

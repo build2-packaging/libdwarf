@@ -3,9 +3,12 @@
 #c.internal.scope = current
 
 using c
+using autoconf
 
 h{*}: extension = h
 c{*}: extension = c
+
+config [bool] config.libdwarf.decompression ?= false
 
 # The test target for cross-testing (running tests under Wine, etc).
 #

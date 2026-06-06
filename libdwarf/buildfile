@@ -1,4 +1,4 @@
-./: {*/ -build/} doc{README.md PACKAGE-README.md NEWS} legal{COPYING} manifest
+./: {*/ -build/} src/ doc{README.md PACKAGE-README.md NEWS} legal{COPYING} manifest
 
 # Don't install tests.
 #

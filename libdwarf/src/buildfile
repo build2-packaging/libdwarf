@@ -1,6 +1,11 @@
 intf_libs = # Interface dependencies.
 impl_libs = # Implementation dependencies.
-#import xxxx_libs += libhello%lib{hello}
+
+if ($config.libdwarf.decompression)
+{
+  import impl_libs += libz%lib{z}
+  import impl_libs += libzstd%lib{zstd}
+}
 
 # Public headers.
 #
@@ -14,7 +19,50 @@ lib{dwarf}: $pub/{$pub_hdrs}
 
 # Private headers and sources as well as dependencies.
 #
-lib{dwarf}: {h c}{**} $impl_libs $intf_libs
+lib{dwarf}: lib{dwarf_private} c{**} $impl_libs $intf_libs
+lib{dwarf_private}: h{** -config} h{config}
+
+h{config}: in{config}
+{
+  autoconf.flavor = cmake
+  in.symbol = '@'
+
+  # HAVE_FULL_MMAP is a libdwarf-specific alias for the standard HAVE_MMAP.
+  autoconf.aliases = HAVE_FULL_MMAP@HAVE_MMAP
+
+  # Version strings derived from $version.
+  PROJECT_VERSION = "$version"
+  PROJECT_NAME = "libdwarf"
+  PROJECT_HOMEPAGE_URL = "https://github.com/davea42/libdwarf-code"
+  PACKAGE_BUGREPORT = "davea42@gmail.com"
+  PACKAGE = "libdwarf"
+  PACKAGE_VERSION = "$version"
+  PACKAGE_NAME = "libdwarf"
+  PACKAGE_STRING = "libdwarf $version"
+  PACKAGE_TARNAME = "libdwarf"
+  PACKAGE_URL = "https://github.com/davea42/libdwarf-code"
+
+  # Config-gated values.
+  HAVE_ZLIB   = $config.libdwarf.decompression
+  HAVE_ZLIB_H = $config.libdwarf.decompression
+  HAVE_ZSTD   = $config.libdwarf.decompression
+  HAVE_ZSTD_H = $config.libdwarf.decompression
+
+  # Unused in source; set false to satisfy the cmake-flavor processor.
+  AC_APPLE_UNIVERSAL_BUILD = false # not referenced in any source file
+  CRAY_STACKSEG_END        = false # not referenced in any source file
+  STACK_DIRECTION          = false # not referenced in any source file
+  LT_OBJDIR                = false # not referenced in any source file
+
+  HAVE_STDAFX_H            = false # this is specific to Visual Studio
+                                   # and also not required.
+
+  # uintptr_t/intptr_t are used in source but come from <stdint.h> (C99),
+  # not from config.h. The #cmakedefine entries are a fallback for ancient
+  # toolchains; false means "don't redefine what stdint.h already provides".
+  uintptr_t = false
+  intptr_t  = false
+}
 
 # Build options.
 #
@@ -24,21 +72,37 @@ out_pfx_src = [dir_path] $out_root/src/
 src_pfx_src = [dir_path] $src_root/src/
 
 c.poptions =+ "-I$out_pfx_src" "-I$src_pfx_src" \
-              "-I$out_pfx_inc" "-I$src_pfx_inc"
+              "-I$out_pfx_inc" "-I$src_pfx_inc" "-I$src_pfx_inc/libdwarf"
 
-#obja{*}: c.poptions += -DLIBDWARF_STATIC_BUILD
-#objs{*}: c.poptions += -DLIBDWARF_SHARED_BUILD
+c.poptions =+ -D_GNU_SOURCE
+
+obja{**}: c.poptions += -DLIBDWARF_STATIC
+objs{**}: c.poptions += -DLIBDWARF_BUILD -DPIC
 
 # Export options.
 #
 lib{dwarf}:
 {
-  c.export.poptions = "-I$out_pfx_inc" "-I$src_pfx_inc"
+  c.export.poptions = "-I$out_pfx_inc" "-I$src_pfx_inc" \
+                      "-I$src_pfx_inc/libdwarf"
   c.export.libs = $intf_libs
+
+  # Convey decompression capability so consumers can adapt (e.g. disable
+  # DWARF section compression when building test objects).
+  export.metadata = 1 libdwarf
+  libdwarf.decompression = [bool] $config.libdwarf.decompression
 }
 
-#liba{dwarf}: c.export.poptions += -DLIBDWARF_STATIC
-#libs{dwarf}: c.export.poptions += -DLIBDWARF_SHARED
+# Separate target carrying private headers and include paths. Consumers that
+# need private headers (e.g. dwarfdump) import this in addition to lib{dwarf}.
+#
+lib{dwarf_private}:
+{
+  c.export.poptions = "-I$out_pfx_src" "-I$src_pfx_src" \
+                      "-I$src_pfx_inc" "-I$src_pfx_inc/libdwarf"
+}
+
+liba{dwarf}: c.export.poptions =+ -DLIBDWARF_STATIC
 
 # For pre-releases use the complete version to make sure they cannot
 # be used in place of another pre-release or the final version. See
@@ -49,6 +113,13 @@ if $version.pre_release
 else
   lib{dwarf}: bin.lib.version = "-$version.major.$version.minor"
 
-# Don't install private headers.
+# Private headers go to private/ so consumers such as dwarfdump can find them
+# in the installed case. config.h may contain architecture-specific information
+# so it goes to include_arch/ (defaults to the same as include/).
 #
-h{*}: install = false
+h{*}:      install = include/libdwarf/private/
+h{config}: install = include_arch/libdwarf/
+
+lib{dwarf}:         c.pkgconfig.include = include/ include/libdwarf/
+lib{dwarf_private}: c.pkgconfig.include = include/ include/libdwarf/ \
+                                          include/libdwarf/private/

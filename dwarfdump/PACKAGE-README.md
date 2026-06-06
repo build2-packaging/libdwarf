@@ -1,9 +1,8 @@
-# dwarfdump - An executable
+# dwarfdump
 
-This is a `build2` package for the [`<UPSTREAM-NAME>`](https://<UPSTREAM-URL>)
-executable. It is a <SUMMARY-OF-FUNCTIONALITY>.
-
-Note that the `dwarfdump` executable in this package provides `build2` metadata.
+This is a `build2` package for the [`dwarfdump`](https://github.com/davea42/libdwarf-code)
+command-line utility. It inspects DWARF debugging information in ELF, Mach-O,
+and PE object files and executables.
 
 
 ## Usage
@@ -13,13 +12,13 @@ To start using `dwarfdump` in your project, add the following build-time
 appropriate:
 
 ```
-depends: * dwarfdump ^<VERSION>
+depends: * dwarfdump ^2.3.2
 ```
 
 Then import the executable in your `buildfile`:
 
 ```
-import! [metadata] <TARGET> = dwarfdump%exe{<TARGET>}
+import! [metadata] dwarfdump = dwarfdump%exe{dwarfdump}
 ```
 
 
@@ -28,18 +27,7 @@ import! [metadata] <TARGET> = dwarfdump%exe{<TARGET>}
 This package provides the following importable targets:
 
 ```
-exe{<TARGET>}
+exe{dwarfdump}
 ```
 
-<DESCRIPTION-OF-IMPORTABLE-TARGETS>
-
-
-## Configuration variables
-
-This package provides the following configuration variables:
-
-```
-[bool] config.dwarfdump.<VARIABLE> ?= false
-```
-
-<DESCRIPTION-OF-CONFIG-VARIABLES>
+The `dwarfdump` command-line tool for inspecting DWARF debug information.
