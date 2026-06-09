@@ -1,16 +1,17 @@
 : 1
 name: libdwarfp
-version: 0.1.0-a.0.z
+version: 2.3.1-a.0.z
 language: c
-project: build2-libdwarf
-summary: dwarfp C library
-license: other: proprietary ; Not free/open source.
+project: libdwarf
+summary: Library to produce DWARF debugging information
+license: LGPL-2.1-or-later ; GNU Lesser General Public License v2.1 or later.
 description-file: README
 package-description-file: PACKAGE-README.md
 changes-file: NEWS
-url: https://example.org/upstream
-email: upstream@example.org
-package-url: https://github.com/build2-packaging/build2-libdwarf
+url: https://github.com/davea42/libdwarf-code
+src-url: https://github.com/davea42/libdwarf-code
+email: davea42@gmail.com
+package-url: https://github.com/build2-packaging/libdwarf
 package-email: packaging@build2.org ; Mailing list.
 depends: * build2 >= 0.18.0
 depends: * bpkg >= 0.18.0

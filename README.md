@@ -10,6 +10,7 @@ these packages in your `build2`-based project, then instead see the
 accompanying package `README.md` files:
 
 - [`libdwarf/PACKAGE-README.md`](libdwarf/PACKAGE-README.md)
+- [`libdwarfp/PACKAGE-README.md`](libdwarfp/PACKAGE-README.md)
 - [`dwarfdump/PACKAGE-README.md`](dwarfdump/PACKAGE-README.md)
 
 The development setup uses the standard `bdep`-based workflow. For example:
