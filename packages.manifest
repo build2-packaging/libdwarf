@@ -3,3 +3,6 @@ location: libdwarf/
 
 :
 location: dwarfdump/
+
+:
+location: libdwarfp/
