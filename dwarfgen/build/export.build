@@ -1,0 +1,6 @@
+$out_root/
+{
+  include dwarfgen/
+}
+
+export $out_root/dwarfgen/$import.target

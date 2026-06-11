@@ -1,6 +1,10 @@
-libs =
-#import libs += libhello%lib{hello}
+import libs = libdwarf%lib{dwarf} \
+              libdwarf%lib{dwarf_private} \
+              libdwarfp%lib{dwarfp} \
+              libdwarfp%lib{dwarfp_private}
 
-exe{dwarfgen}: {hxx ixx txx cxx}{**} $libs
+./: exe{dwarfgen}: {hxx cxx}{**} $libs
 
-cxx.poptions =+ "-I$out_root" "-I$src_root"
+cxx.poptions =+ "-I$out_root" "-I$src_root" \
+               "-I$out_base" "-I$src_base" \
+               -D_GNU_SOURCE -DLIBDWARF_STATIC

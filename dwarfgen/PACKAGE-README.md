@@ -1,9 +1,9 @@
-# dwarfgen - An executable
+# dwarfgen
 
-This is a `build2` package for the [`<UPSTREAM-NAME>`](https://<UPSTREAM-URL>)
-executable. It is a <SUMMARY-OF-FUNCTIONALITY>.
-
-Note that the `dwarfgen` executable in this package provides `build2` metadata.
+This is a `build2` package for the [`dwarfgen`](https://github.com/davea42/libdwarf-code)
+command-line tool. It reads an existing ELF binary with DWARF debug information and
+produces a new ELF object file containing generated DWARF, using the `libdwarfp` producer
+library.
 
 
 ## Usage
@@ -13,13 +13,13 @@ To start using `dwarfgen` in your project, add the following build-time
 appropriate:
 
 ```
-depends: * dwarfgen ^<VERSION>
+depends: * dwarfgen ^2.3.2
 ```
 
 Then import the executable in your `buildfile`:
 
 ```
-import! [metadata] <TARGET> = dwarfgen%exe{<TARGET>}
+import! [metadata] dwarfgen = dwarfgen%exe{dwarfgen}
 ```
 
 
@@ -28,18 +28,7 @@ import! [metadata] <TARGET> = dwarfgen%exe{<TARGET>}
 This package provides the following importable targets:
 
 ```
-exe{<TARGET>}
+exe{dwarfgen}
 ```
 
-<DESCRIPTION-OF-IMPORTABLE-TARGETS>
-
-
-## Configuration variables
-
-This package provides the following configuration variables:
-
-```
-[bool] config.dwarfgen.<VARIABLE> ?= false
-```
-
-<DESCRIPTION-OF-CONFIG-VARIABLES>
+The `dwarfgen` command-line tool for generating DWARF debug information.
