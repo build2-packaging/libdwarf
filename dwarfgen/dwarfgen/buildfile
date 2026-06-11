@@ -1,10 +1,16 @@
-import libs = libdwarf%lib{dwarf} \
-              libdwarf%lib{dwarf_private} \
+import libdwarf = libdwarf%lib{dwarf}
+import libs = libdwarf%lib{dwarf_private} \
               libdwarfp%lib{dwarfp} \
               libdwarfp%lib{dwarfp_private}
+libs += $libdwarf
 
-./: exe{dwarfgen}: {hxx cxx}{**} $libs
+./: exe{dwarfgen}: {hxx cxx}{** -dummy} $libs
 
 cxx.poptions =+ "-I$out_root" "-I$src_root" \
                "-I$out_base" "-I$src_base" \
                -D_GNU_SOURCE -DLIBDWARF_STATIC
+
+exe{dwarfgen}: file{dummyexecutable.debug}: \
+  include = ($cxx.target.system != 'win32-msvc' && $cxx.target.system != 'mingw32' ? adhoc : false)
+exe{dwarfgen}: testscript: \
+  include = ($cxx.target.system != 'win32-msvc' && $cxx.target.system != 'mingw32')

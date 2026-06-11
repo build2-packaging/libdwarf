@@ -1,0 +1,17 @@
+: obj-roundtrip
+$* -t obj -c 0 -o out.o $src_base/dummyexecutable.debug &out.o >>~/EOO/
+/.*/
+/*
+/New Elf section: \.debug_info .*/
+/.*/
+/*
+/Inserted [0-9]+ bytes into elf section index [0-9]+/
+/.*/
+/*
+/ output image size in bytes [0-9]+/
+/.*/
+/*
+/Debug_Str: debug_info str count [0-9]+.*/
+/.*/
+/*
+EOO

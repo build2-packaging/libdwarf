@@ -13,19 +13,9 @@ c.poptions =+ "-I$out_root" "-I$src_root" \
 
 conf{dwarfdump}@./: install = $install.data
 
-# Smoke test: import and run against a small DWARF-carrying binary.
+# Smoke test: run against a pre-committed DWARF-carrying binary.
 #
-decompression = $($libdwarf: libdwarf.decompression)
-
-obje{dummy}: c{dummy}
-obje{dummy}: c.coptions += -g -gdwarf-4
-if (!$decompression)
-  obje{dummy}: c.coptions += -gz=none  # prevent SHF_COMPRESSED sections that libdwarf cannot read
-exe{dwarfdump}: obje{dummy}: \
-  include = ($c.target.system != 'win32-msvc' ? adhoc : false)
-
-exe{dwarfdump}: testscript: \
-  include = ($c.target.system != 'win32-msvc' && $c.target.system != 'mingw32')
+exe{dwarfdump}: file{dummyexecutable.debug}@./ testscript
 
 # Unit tests
 #
