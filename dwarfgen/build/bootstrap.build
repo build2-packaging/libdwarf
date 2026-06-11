@@ -1,0 +1,6 @@
+project = dwarfgen
+
+using version
+using config
+using install
+using dist

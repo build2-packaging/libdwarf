@@ -6,3 +6,6 @@ location: dwarfdump/
 
 :
 location: libdwarfp/
+
+:
+location: dwarfgen/
