@@ -1,3 +1,20 @@
-import libs = libdwarfp%lib{dwarfp}
+import libs = libdwarfp%lib{dwarfp_private}
 
-exe{driver}: {h c}{**} $libs testscript{**}
+# Directory symlinks in this directory:
+#
+# src -> ../../../upstream/src   (upstream source tree; mirrors the
+#                                 hierarchy tests expect for data files)
+
+# One executable per upstream self-contained test (has its own main()).
+for t: c{test_*}
+  ./: exe{test-$name($t)}: $t $libs testscript
+
+# Tests requiring extra compilation units from the libdwarfp/libdwarf sources.
+#
+exe{test-test_extra_flag_strings}: \
+  src/lib/libdwarfp/c{dwarf_pro_log_extra_flag_strings} \
+  src/lib/libdwarf/c{dwarf_string}
+
+# Build options.
+#
+c.poptions =+ -DLIBDWARF_STATIC

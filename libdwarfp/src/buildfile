@@ -1,6 +1,11 @@
 intf_libs = # Interface dependencies.
 impl_libs = # Implementation dependencies.
-#import xxxx_libs += libhello%lib{hello}
+
+if ($config.libdwarfp.decompression)
+{
+  import impl_libs += libz%lib{z}
+  import impl_libs += libzstd%lib{zstd}
+}
 
 # Public headers.
 #
@@ -14,7 +19,50 @@ lib{dwarfp}: $pub/{$pub_hdrs}
 
 # Private headers and sources as well as dependencies.
 #
-lib{dwarfp}: {h c}{**} $impl_libs $intf_libs
+lib{dwarfp}: lib{dwarfp_private} c{**} $impl_libs $intf_libs
+lib{dwarfp_private}: h{** -config} h{config}
+
+h{config}: in{config}
+{
+  autoconf.flavor = cmake
+  in.symbol = '@'
+
+  # HAVE_FULL_MMAP is a libdwarfp-specific alias for the standard HAVE_MMAP.
+  autoconf.aliases = HAVE_FULL_MMAP@HAVE_MMAP
+
+  # Version strings derived from $version.
+  PROJECT_VERSION = "$version"
+  PROJECT_NAME = "libdwarfp"
+  PROJECT_HOMEPAGE_URL = "https://github.com/davea42/libdwarf-code"
+  PACKAGE_BUGREPORT = "davea42@gmail.com"
+  PACKAGE = "libdwarfp"
+  PACKAGE_VERSION = "$version"
+  PACKAGE_NAME = "libdwarfp"
+  PACKAGE_STRING = "libdwarfp $version"
+  PACKAGE_TARNAME = "libdwarfp"
+  PACKAGE_URL = "https://github.com/davea42/libdwarfp-code"
+
+  # Config-gated values.
+  HAVE_ZLIB   = $config.libdwarfp.decompression
+  HAVE_ZLIB_H = $config.libdwarfp.decompression
+  HAVE_ZSTD   = $config.libdwarfp.decompression
+  HAVE_ZSTD_H = $config.libdwarfp.decompression
+
+  # Unused in source; set false to satisfy the cmake-flavor processor.
+  AC_APPLE_UNIVERSAL_BUILD = false # not referenced in any source file
+  CRAY_STACKSEG_END        = false # not referenced in any source file
+  STACK_DIRECTION          = false # not referenced in any source file
+  LT_OBJDIR                = false # not referenced in any source file
+
+  HAVE_STDAFX_H            = false # this is specific to Visual Studio
+                                   # and also not required.
+
+  # uintptr_t/intptr_t are used in source but come from <stdint.h> (C99),
+  # not from config.h. The #cmakedefine entries are a fallback for ancient
+  # toolchains; false means "don't redefine what stdint.h already provides".
+  uintptr_t = false
+  intptr_t  = false
+}
 
 # Build options.
 #
@@ -26,8 +74,10 @@ src_pfx_src = [dir_path] $src_root/src/
 c.poptions =+ "-I$out_pfx_src" "-I$src_pfx_src" \
               "-I$out_pfx_inc" "-I$src_pfx_inc"
 
-#obja{*}: c.poptions += -DLIBDWARFP_STATIC_BUILD
-#objs{*}: c.poptions += -DLIBDWARFP_SHARED_BUILD
+c.poptions =+ -D_GNU_SOURCE
+
+obja{**}: c.poptions += -DLIBDWARF_STATIC
+objs{**}: c.poptions += -DLIBDWARF_BUILD -DPIC
 
 # Export options.
 #
@@ -35,10 +85,23 @@ lib{dwarfp}:
 {
   c.export.poptions = "-I$out_pfx_inc" "-I$src_pfx_inc"
   c.export.libs = $intf_libs
+
+  # Convey decompression capability so consumers can adapt (e.g. disable
+  # DWARFp section compression when building test objects).
+  export.metadata = 1 libdwarfp
+  libdwarfp.decompression = [bool] $config.libdwarfp.decompression
 }
 
-#liba{dwarfp}: c.export.poptions += -DLIBDWARFP_STATIC
-#libs{dwarfp}: c.export.poptions += -DLIBDWARFP_SHARED
+# Separate target carrying private headers and include paths. Consumers that
+# need private headers (e.g. dwarfgen) import this in addition to lib{dwarfp}.
+#
+lib{dwarfp_private}:
+{
+  c.export.poptions = "-I$out_pfx_src" "-I$src_pfx_src" \
+                      "-I$src_pfx_inc" "-I$src_pfx_inc/libdwarfp"
+}
+
+liba{dwarfp}: c.export.poptions =+ -DLIBDWARF_STATIC
 
 # For pre-releases use the complete version to make sure they cannot
 # be used in place of another pre-release or the final version. See
@@ -49,6 +112,12 @@ if $version.pre_release
 else
   lib{dwarfp}: bin.lib.version = "-$version.major.$version.minor"
 
-# Don't install private headers.
+# Private headers go to private/ so consumers such as dwarfgen can find them
+# in the installed case. config.h may contain architecture-specific information
+# so it goes to include_arch/ (defaults to the same as include/).
 #
-h{*}: install = false
+h{*}:      install = include/libdwarfp/private/
+h{config}: install = include_arch/libdwarfp/
+
+lib{dwarfp_private}: c.pkgconfig.include = include/ include/libdwarfp/ \
+                                           include/libdwarfp/private/
