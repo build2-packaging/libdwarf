@@ -1,7 +1,8 @@
 # libdwarfp - A C library
 
-This is a `build2` package for the [`<UPSTREAM-NAME>`](https://<UPSTREAM-URL>)
-C library. It provides <SUMMARY-OF-FUNCTIONALITY>.
+This is a `build2` package for the [`libdwarfp`](https://github.com/davea42/libdwarf-code)
+C library. It provides producing DWARF debugging information for embedding in
+ELF, Mach-O, and PE object files and executables.
 
 
 ## Usage
@@ -10,13 +11,13 @@ To start using `libdwarfp` in your project, add the following `depends`
 value to your `manifest`, adjusting the version constraint as appropriate:
 
 ```
-depends: libdwarfp ^<VERSION>
+depends: libdwarfp ^2.3.2
 ```
 
 Then import the library in your `buildfile`:
 
 ```
-import libs = libdwarfp%lib{<TARGET>}
+import libs = libdwarfp%lib{dwarfp}
 ```
 
 
@@ -25,10 +26,11 @@ import libs = libdwarfp%lib{<TARGET>}
 This package provides the following importable targets:
 
 ```
-lib{<TARGET>}
+lib{dwarfp}
 ```
 
-<DESCRIPTION-OF-IMPORTABLE-TARGETS>
+The main compiled DWARF producer library. Link against this target to use
+`<libdwarfp/libdwarfp.h>`.
 
 
 ## Configuration variables
@@ -36,7 +38,10 @@ lib{<TARGET>}
 This package provides the following configuration variables:
 
 ```
-[bool] config.libdwarfp.<VARIABLE> ?= false
+[bool] config.libdwarfp.decompression ?= false
 ```
 
-<DESCRIPTION-OF-CONFIG-VARIABLES>
+`config.libdwarfp.decompression`: enable zlib and zstd decompression of
+compressed DWARF sections. When `true`, the `libz` and `libzstd` package
+dependencies become active and `HAVE_ZLIB`, `HAVE_ZSTD` are defined in
+the generated `config.h`.

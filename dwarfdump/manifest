@@ -6,8 +6,12 @@ project: libdwarf
 summary: Command-line utility for inspecting DWARF debugging information
 license: GPL-2.0-only ; GNU General Public License v2.0 only.
 description-file: README
+package-description-file: PACKAGE-README.md
+changes-file: ChangeLog
 url: https://github.com/davea42/libdwarf-code
+email: davea42@gmail.com
 package-url: https://github.com/build2-packaging/libdwarf
+package-email: packaging@build2.org ; Mailing list.
 depends: * build2 >= 0.18.0
 depends: * bpkg >= 0.18.0
 depends: libdwarf == $

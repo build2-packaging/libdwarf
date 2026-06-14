@@ -1,4 +1,4 @@
-# dwarfgen
+# dwarfgen - A C++ command-line tool
 
 This is a `build2` package for the [`dwarfgen`](https://github.com/davea42/libdwarf-code)
 command-line tool. It reads an existing ELF binary with DWARF debug information and

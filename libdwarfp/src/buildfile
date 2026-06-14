@@ -40,7 +40,7 @@ h{config}: in{config}
   PACKAGE_NAME = "libdwarfp"
   PACKAGE_STRING = "libdwarfp $version"
   PACKAGE_TARNAME = "libdwarfp"
-  PACKAGE_URL = "https://github.com/davea42/libdwarfp-code"
+  PACKAGE_URL = "https://github.com/davea42/libdwarf-code"
 
   # Config-gated values.
   HAVE_ZLIB   = $config.libdwarfp.decompression

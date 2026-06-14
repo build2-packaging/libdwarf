@@ -9,7 +9,6 @@ description-file: README.md
 package-description-file: PACKAGE-README.md
 changes-file: NEWS
 url: https://github.com/davea42/libdwarf-code
-src-url: https://github.com/davea42/libdwarf-code
 email: davea42@gmail.com
 package-url: https://github.com/build2-packaging/libdwarf
 package-email: packaging@build2.org ; Mailing list.

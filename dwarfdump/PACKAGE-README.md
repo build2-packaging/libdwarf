@@ -1,4 +1,4 @@
-# dwarfdump
+# dwarfdump - A command-line utility
 
 This is a `build2` package for the [`dwarfdump`](https://github.com/davea42/libdwarf-code)
 command-line utility. It inspects DWARF debugging information in ELF, Mach-O,

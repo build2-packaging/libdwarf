@@ -1,4 +1,4 @@
-# libdwarf
+# libdwarf - A C library
 
 This is a `build2` package for the [`libdwarf`](https://github.com/davea42/libdwarf-code)
 C library. It provides reading and writing of DWARF debugging information
