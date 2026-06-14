@@ -1,0 +1,7 @@
+: 1
+name: dwarfdump
+version: 2.3.1+1
+language: c
+project: libdwarf
+summary: Command-line utility for inspecting DWARF debugging information
+license: GPL-2.0-only; GNU General Public License v2.0 only.

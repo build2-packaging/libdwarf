@@ -1,0 +1,7 @@
+: 1
+name: libdwarfp
+version: 2.3.1+1
+language: c
+project: libdwarf
+summary: Library to produce DWARF debugging information
+license: LGPL-2.1-or-later; GNU Lesser General Public License v2.1 or later.
